@@ -9,6 +9,8 @@ je vous laisser regarder ça sur internet
 
 import pygame
 import time
+import pygame.gfxdraw
+
 
 def grille():
     return [[0 for i in range(19)] for j in range(19)]
@@ -27,11 +29,14 @@ def affichage_graph(g):
     for x in range(19):
         for y in range(19):
             if g[x][y] == 0:
-                pygame.draw.circle(screen, (225, 225, 225), ((x*20)+20, (y*20)+20), 10)
+                pygame.gfxdraw.filled_circle(screen, ((x*40)+40), ((y*40)+40), 10, (120, 120, 120))
+                pygame.gfxdraw.aacircle(screen, ((x*40)+40), ((y*40)+40), 10, (120, 120, 120))
             if g[x][y] == 1:
-                pygame.draw.circle(screen, BLUE, ((x*20)+20, (y*20)+20), 10)
+                pygame.gfxdraw.filled_circle(screen, ((x*40)+40), ((y*40)+40), 19, (240, 240, 240))
+                pygame.gfxdraw.aacircle(screen, ((x*40)+40), ((y*40)+40), 19, (240, 240, 240))
             elif g[x][y] == 2:
-                pygame.draw.circle(screen, BLACK, ((x*20)+20, (y*20)+20), 10)
+                pygame.gfxdraw.filled_circle(screen, ((x*40)+40), ((y*40)+40), 19, (23, 22, 22))
+                pygame.gfxdraw.aacircle(screen, ((x*40)+40), ((y*40)+40), 19, (23, 22, 22))
 
 def verif(a, b, g):
     ap, bp = a-1, b-1
@@ -96,89 +101,49 @@ def gagner(a, b, g, j):
             except IndexError:
                 None
 
-# fin = False
+
 pygame.init()
-screen = pygame.display.set_mode(size= (400, 400))
+screen = pygame.display.set_mode(size= (1400, 800))
 running = True
 clock = pygame.time.Clock()
 joueur = 0
-gr = grille()
-gril = gr
-affichage(gr)
-WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
-BLACK = (0, 0, 0)
 a, b = 0, 0
 pygame.font.init()
-font = pygame.font.SysFont("arial", 24)
+font = pygame.font.SysFont("calibri", 35)
 render = True
+gr = grille()
+gril = gr
+couleurjoueur = ["blancs", "noirs"]
 while running:
-    # if joueur%2 == 0:
-    #     a = int(input("Joueur 1 : ligne "))
-    #     b = int(input("Joueur 1 : colonne "))
-    #     if verif(a, b, gr) == True:
-    #         gril = joue(a, b, gr, joueur)
-    #         affichage(gril)
-    #         if gagner(a, b, gril, joueur) == True:
-    #             print("Le joueur 1 à gagné")
-    #         else:
-    #             joueur += 1
-    #             gr = gril
-    #     elif verif(a, b, gril) == False:
-    #         print("T'es bête ou quoi mon frr")
-    # elif joueur%2 == 1:
-    #     a = int(input("Joueur 2 : ligne "))
-    #     b = int(input("Joueur 2 : colonne "))
-    #     if verif(a, b, gr) == True:
-    #         gril = joue(a, b, gr, joueur)
-    #         affichage(gril)
-    #         if gagner(a, b, gril, joueur) == True:
-    #             print("Le joueur 2 à gagné")
-    #         else: 
-    #             joueur += 1
-    #             gr = gril
-    #     elif verif(a, b, gril) == False:
-    #         print("T'es bête ou quoi mon frr")
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            a = (event.pos[0]+9)//20
-            b = (event.pos[1]+9)//20
+            a = (event.pos[0]+19)//40
+            b = (event.pos[1]+19)//40
             print(event.pos[0], a)
             print(event.pos[1], b)
-            if joueur%2 == 0:
-                if verif(a, b, gr) == True:
-                    gril = joue(a, b, gr, joueur)
-                    affichage_graph(gril)
-                    if gagner(a, b, gril, joueur) == True:
-                        texte = font.render("Le joueur 1 à gagné", True, (0, 0, 0))
-                        screen.blit(texte, (20, 20))
-                        print("Le joueur 1 à gagné")
-                        pygame.display.flip()
-                        render = False
-                    else:
-                        joueur += 1
-                        gr = gril
-                elif verif(a, b, gril) == False:
-                    print("T'es bête ou quoi mon frr")
-            elif joueur%2 == 1:
-                if verif(a, b, gr) == True:
-                    gril = joue(a, b, gr, joueur)
-                    affichage_graph(gril)
-                    if gagner(a, b, gril, joueur) == True:
-                        texte = font.render("Le joueur 2 à gagné", True, (0, 0, 0))
-                        screen.blit(texte, (20, 20))
-                        pygame.display.flip()
-                        render = False
-                    else: 
-                        joueur += 1
-                        gr = gril
-                elif verif(a, b, gril) == False:
-                    print("T'es bête ou quoi mon frr")
-    screen.fill(WHITE)
+            if verif(a, b, gr) == True:
+                gril = joue(a, b, gr, joueur)
+                affichage_graph(gril)
+                if gagner(a, b, gril, joueur) == True:
+                    texte = font.render(f"Les {couleurjoueur[joueur%2]} ont gagné", True, (0, 0, 0))
+                    pygame.draw.rect(screen, (217, 186, 108), (800, 20, 1400, 100))
+                    screen.blit(texte, (820, 40))
+                    print(f"Le joueur {joueur%2+1} à gagné")
+                    pygame.display.flip()
+                    render = False
+                else:
+                    joueur += 1
+                    gr = gril
+            elif verif(a, b, gril) == False:
+                print("T'es bête ou quoi mon frr")
+    screen.fill((217, 186, 108))
     affichage_graph(gr)
     if render == True:
+        texte = font.render(f"C'est aux {couleurjoueur[joueur%2]} de jouer", True, (0, 0, 0))
+        screen.blit(texte, (820, 40))
         pygame.display.flip()
     clock.tick(60)
 
